@@ -1,12 +1,33 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-base-200 p-4">
-    <div class="card w-full max-w-md bg-base-100 shadow-sm">
+    <div class="card w-full max-w-md bg-base-100 border border-zinc-300">
       <div class="card-body">
-        <h2 class="card-title text-primary text-3xl font-bold! text-center justify-center mb-6">
-          Register
+        <h2 class="card-title text-2xl text-primary font-bold! text-center justify-center mb-3!">
+          Create Account
         </h2>
 
-        <form @submit.prevent="handleLogin" class="space-y-2!">
+        <form @submit.prevent="handleRegister" class="space-y-3!">
+            <div class="flex gap-2">
+
+                <BaseInput
+                  v-model="formData.firstName"
+                  label="First Name"
+                  placeholder="Enter your first name"
+                  :required="true"
+                  :errorMsg="errors.firstName"
+                  @blur="validateField('firstName')"
+                />
+      
+                <BaseInput
+                  v-model="formData.lastName"
+                  label="Last Name"
+                  placeholder="Enter your last name"
+                  :required="true"
+                  :errorMsg="errors.lastName"
+                  @blur="validateField('lastName')"
+                />
+            </div>
+
           <BaseInput
             v-model="formData.email"
             type="email"
@@ -15,23 +36,7 @@
             :required="true"
             :errorMsg="errors.email"
             @blur="validateField('email')"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 18 18"
-              fill="none"
-            >
-              <path
-                d="M8 13V7.5C8 6.57174 7.63125 5.6815 6.97487 5.02513C6.3185 4.36875 5.42826 4 4.5 4M8 13H1V7.5C1 6.57174 1.36875 5.6815 2.02513 5.02513C2.6815 4.36875 3.57174 4 4.5 4M8 13V17M4.5 4H11M11 4V1H13.5M11 4V7M7.5 13H17V7C17 6.20435 16.6839 5.44129 16.1213 4.87868C15.5587 4.31607 14.7956 4 14 4M12 13V17M4 10.5H5"
-                stroke="#BBBDC2"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </BaseInput>
+          />
 
           <BaseInputPassword
             v-model="formData.password"
@@ -42,19 +47,30 @@
             @blur="validateField('password')"
           />
 
+          <BaseInputPassword
+            v-model="formData.confirmPassword"
+            label="Confirm Password"
+            placeholder="Confirm your password"
+            :required="true"
+            :errorMsg="errors.confirmPassword"
+            @blur="validateField('confirmPassword')"
+          />
+
           <div class="pt-4">
-            <BaseButton type="submit" :loading="isLoading" class="w-full" @click="handleLogin">
-              Login
+            <BaseButton type="submit" :loading="isLoading" class="w-full" @click="handleRegister">
+              Register
             </BaseButton>
           </div>
         </form>
 
-        <div class="divider mt-3!">OR</div>
+        <div class="divider mt-2!">OR</div>
 
         <div class="text-center">
           <p class="text-sm">
-            Don't have an account?
-            <a href="/register" class="link link-primary font-semibold">Register</a>
+            Already have an account?
+            <RouterLink :to="{ name: 'login' }" class="link link-primary font-semibold"
+              >Login</RouterLink
+            >
           </p>
         </div>
       </div>
@@ -64,26 +80,46 @@
 
 <script setup>
   import { ref, reactive } from 'vue'
-  import BaseButton from '@/components/base/BaseButton.vue'
   import BaseInputPassword from '@/components/base/BaseInputPassword.vue'
 
   const isLoading = ref(false)
-  const rememberMe = ref(false)
 
   const formData = reactive({
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
+    confirmPassword: '',
   })
 
   const errors = reactive({
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
+    confirmPassword: '',
   })
 
   const validateField = (field) => {
     errors[field] = ''
 
     switch (field) {
+      case 'firstName':
+        if (!formData.firstName.trim()) {
+          errors.firstName = 'First name is required'
+        } else if (formData.firstName.trim().length < 2) {
+          errors.firstName = 'First name must be at least 2 characters'
+        }
+        break
+
+      case 'lastName':
+        if (!formData.lastName.trim()) {
+          errors.lastName = 'Last name is required'
+        } else if (formData.lastName.trim().length < 2) {
+          errors.lastName = 'Last name must be at least 2 characters'
+        }
+        break
+
       case 'email':
         if (!formData.email.trim()) {
           errors.email = 'Email is required'
@@ -95,19 +131,35 @@
       case 'password':
         if (!formData.password) {
           errors.password = 'Password is required'
+        } else if (formData.password.length < 8) {
+          errors.password = 'Password must be at least 8 characters'
+        }
+        if (formData.confirmPassword) {
+          validateField('confirmPassword')
+        }
+        break
+
+      case 'confirmPassword':
+        if (!formData.confirmPassword) {
+          errors.confirmPassword = 'Please confirm your password'
+        } else if (formData.password !== formData.confirmPassword) {
+          errors.confirmPassword = 'Passwords do not match'
         }
         break
     }
   }
 
   const validateForm = () => {
+    validateField('firstName')
+    validateField('lastName')
     validateField('email')
     validateField('password')
+    validateField('confirmPassword')
 
     return !Object.values(errors).some((error) => error !== '')
   }
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     if (!validateForm()) {
       return
     }
@@ -118,18 +170,19 @@
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
-      // Your login API call would go here
-      console.log('Login data:', {
+      // Your registration API call would go here
+      console.log('Registration data:', {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
         email: formData.email,
         password: formData.password,
-        rememberMe: rememberMe.value,
       })
 
-      // Handle successful login (e.g., store token, redirect to dashboard)
-      alert('Login successful!')
+      // Handle successful registration (e.g., redirect to login or dashboard)
+      alert('Registration successful!')
     } catch (error) {
-      console.error('Login error:', error)
-      alert('Login failed. Please check your credentials.')
+      console.error('Registration error:', error)
+      alert('Registration failed. Please try again.')
     } finally {
       isLoading.value = false
     }

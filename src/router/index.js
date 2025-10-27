@@ -9,6 +9,12 @@ const router = createRouter({
       component: () => import('@/views/Auth/RegisterView.vue'),
       meta: { title: 'Register' },
     },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/Auth/LoginView.vue'),
+      meta: { title: 'Login' },
+    },
   ],
 })
 
