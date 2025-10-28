@@ -25,5 +25,17 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  return { getToken, setToken, register }
+  const login = async (payload) => {
+    try {
+      const res = await api.post('/auth/login', payload)
+      if (res.data.data.token) {
+        setToken(res.data.data.token)
+      }
+      return res.data
+    } catch (err) {
+      throw err.response?.data || err.message
+    }
+  }
+
+  return { getToken, setToken, register, login }
 })

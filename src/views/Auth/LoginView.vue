@@ -10,9 +10,8 @@
           <BaseInput
             v-model="formData.email"
             type="email"
-            label="Email"
+            label="Email *"
             placeholder="Enter your email"
-            :required="true"
             :errorMsg="errors.email"
             @blur="validateField('email')"
           >
@@ -35,9 +34,8 @@
 
           <BaseInputPassword
             v-model="formData.password"
-            label="Password"
+            label="Password *"
             placeholder="Enter your password"
-            :required="true"
             :errorMsg="errors.password"
             @blur="validateField('password')"
           />
@@ -54,7 +52,9 @@
         <div class="text-center">
           <p class="text-sm">
             Don't have an account?
-            <a href="/register" class="link link-primary font-semibold">Register</a>
+            <RouterLink :to="{ name: 'register' }" class="link link-primary font-semibold">
+              Register
+            </RouterLink>
           </p>
         </div>
       </div>
@@ -65,9 +65,15 @@
 <script setup>
   import { ref, reactive } from 'vue'
   import BaseInputPassword from '@/components/base/BaseInputPassword.vue'
+  import { useAuthStore } from '@/stores/auth'
+  import { useToast } from '@/composables/useToast'
+  import { useRouter } from 'vue-router'
+
+  const authStore = useAuthStore()
+  const router = useRouter()
+  const toast = useToast()
 
   const isLoading = ref(false)
-  const rememberMe = ref(false)
 
   const formData = reactive({
     email: '',
@@ -114,21 +120,13 @@
     isLoading.value = true
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const res = await authStore.login(formData)
+      if (!res.result) return
 
-      // Your login API call would go here
-      console.log('Login data:', {
-        email: formData.email,
-        password: formData.password,
-        rememberMe: rememberMe.value,
-      })
-
-      // Handle successful login (e.g., store token, redirect to dashboard)
-      alert('Login successful!')
+      router.push({ name: 'dashboard' })
     } catch (error) {
-      console.error('Login error:', error)
-      alert('Login failed. Please check your credentials.')
+      const message = error?.message || 'Failed to login.'
+      toast.showError(message)
     } finally {
       isLoading.value = false
     }

@@ -62,9 +62,9 @@
         <div class="text-center">
           <p class="text-sm">
             Already have an account?
-            <RouterLink :to="{ name: 'login' }" class="link link-primary font-semibold"
-              >Login</RouterLink
-            >
+            <RouterLink :to="{ name: 'login' }" class="link link-primary font-semibold">
+              Login
+            </RouterLink>
           </p>
         </div>
       </div>
@@ -81,7 +81,6 @@
 
   const authStore = useAuthStore()
   const router = useRouter()
-
   const toast = useToast()
 
   const isLoading = ref(false)
