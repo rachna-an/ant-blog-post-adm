@@ -28,6 +28,12 @@ const router = createRouter({
           component: () => import('@/views/Dashboard/DashboardView.vue'),
           meta: { title: 'Dashboard' },
         },
+        {
+          path: 'categories',
+          name: 'category.index',
+          component: () => import('@/views/Category/IndexView.vue'),
+          meta: { title: 'Categories' },
+        },
       ],
     },
   ],

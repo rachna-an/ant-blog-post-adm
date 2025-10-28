@@ -3,7 +3,7 @@
     class="navbar min-h-[62px] bg-base-100 border-b border-base-300 sticky top-0 z-10 shadow-2xs"
   >
     <div class="navbar-start">
-      <div class="!h-[61px] w-[10px] bg-white absolute -left-1.5"></div>
+      <div class="!h-[62px] w-[10px] bg-white absolute -left-1.5"></div>
 
       <label for="my-drawer" class="btn btn-square bg-transparent border-0 drawer-button lg:hidden">
         <svg
@@ -101,8 +101,8 @@
     v-model:visible="isLogout"
     title="Logout"
     message="Are you sure you want to logout?"
-    :loading="authStore.isLoggingOut"
-    :buttonText="authStore.isLoggingOut ? 'Logging out' : 'Logout'"
+    :loading="isLoading"
+    :buttonText="isLoading ? 'Logging out' : 'Logout'"
     @confirm="handleLogout"
   />
 </template>
@@ -115,6 +115,7 @@
   const router = useRouter()
 
   const isLogout = ref(false)
+  const isLoading = ref(false)
   const hideDropdown = ref(false)
   const user = computed(() => authStore.getUser)
 
