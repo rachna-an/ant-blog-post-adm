@@ -7,51 +7,45 @@
         </h2>
 
         <form @submit.prevent="handleRegister" class="space-y-3!">
-            <div class="flex gap-2">
+          <div class="flex gap-2">
+            <BaseInput
+              v-model="formData.firstName"
+              label="First Name *"
+              placeholder="Enter your first name"
+              :errorMsg="errors.firstName"
+              @blur="validateField('firstName')"
+            />
 
-                <BaseInput
-                  v-model="formData.firstName"
-                  label="First Name"
-                  placeholder="Enter your first name"
-                  :required="true"
-                  :errorMsg="errors.firstName"
-                  @blur="validateField('firstName')"
-                />
-      
-                <BaseInput
-                  v-model="formData.lastName"
-                  label="Last Name"
-                  placeholder="Enter your last name"
-                  :required="true"
-                  :errorMsg="errors.lastName"
-                  @blur="validateField('lastName')"
-                />
-            </div>
+            <BaseInput
+              v-model="formData.lastName"
+              label="Last Name *"
+              placeholder="Enter your last name"
+              :errorMsg="errors.lastName"
+              @blur="validateField('lastName')"
+            />
+          </div>
 
           <BaseInput
             v-model="formData.email"
             type="email"
-            label="Email"
+            label="Email *"
             placeholder="Enter your email"
-            :required="true"
             :errorMsg="errors.email"
             @blur="validateField('email')"
           />
 
           <BaseInputPassword
             v-model="formData.password"
-            label="Password"
+            label="Password *"
             placeholder="Enter your password"
-            :required="true"
             :errorMsg="errors.password"
             @blur="validateField('password')"
           />
 
           <BaseInputPassword
             v-model="formData.confirmPassword"
-            label="Confirm Password"
+            label="Confirm Password *"
             placeholder="Confirm your password"
-            :required="true"
             :errorMsg="errors.confirmPassword"
             @blur="validateField('confirmPassword')"
           />
@@ -81,6 +75,14 @@
 <script setup>
   import { ref, reactive } from 'vue'
   import BaseInputPassword from '@/components/base/BaseInputPassword.vue'
+  import { useAuthStore } from '@/stores/auth'
+  import { useToast } from '@/composables/useToast'
+  import { useRouter } from 'vue-router'
+
+  const authStore = useAuthStore()
+  const router = useRouter()
+
+  const toast = useToast()
 
   const isLoading = ref(false)
 
@@ -167,22 +169,15 @@
     isLoading.value = true
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      const res = await authStore.register(formData)
+      if (!res.result) return
 
-      // Your registration API call would go here
-      console.log('Registration data:', {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.email,
-        password: formData.password,
-      })
+      toast.showSuccess('Account created successfully! You can now log in.')
 
-      // Handle successful registration (e.g., redirect to login or dashboard)
-      alert('Registration successful!')
+      router.push({ name: 'login' })
     } catch (error) {
-      console.error('Registration error:', error)
-      alert('Registration failed. Please try again.')
+      const message = error?.message || 'Failed to register.'
+      toast.showError(message)
     } finally {
       isLoading.value = false
     }
