@@ -15,7 +15,7 @@
         :disabled="disabled"
       />
     </label>
-    <div v-if="errorMsg" class="text-error pt-2">{{ errorMsg }}</div>
+    <div v-if="errorMsg" class="text-error pt-2 text-sm">{{ errorMsg }}</div>
   </div>
 </template>
 
