@@ -17,27 +17,56 @@ const router = createRouter({
       meta: { title: 'Login' },
     },
     {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: () => import('@/views/Dashboard/DashboardView.vue'),
-      meta: { title: 'Dashboard', requiresAuth: true },
+      path: '/',
+      redirect: '/dashboard',
+      component: () => import('@/layouts/AppLayout.vue'),
+      meta: { requiresAuth: true },
+      children: [
+        {
+          path: 'dashboard',
+          name: 'dashboard',
+          component: () => import('@/views/Dashboard/DashboardView.vue'),
+          meta: { title: 'Dashboard' },
+        },
+      ],
     },
   ],
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
-  const token = authStore.getToken
 
   document.title = to.meta.title ? `${to.meta.title} | Admin` : 'Admin'
 
-  if (to.meta.requiresAuth && !token) {
-    next({ name: 'login' })
-  } else if ((to.name === 'login' || to.name === 'register') && token) {
-    next({ name: 'dashboard' })
-  } else {
-    next()
+  const requiresAuth = to.meta.requiresAuth
+  const isAuthPage = to.name === 'login' || to.name === 'register'
+  const { getToken: token, isAuthenticated } = authStore
+
+  // Redirect authenticated users away from auth pages
+  if (isAuthPage && isAuthenticated) {
+    return next({ name: 'dashboard' })
   }
+
+  // Handle protected routes
+  if (requiresAuth) {
+    if (!token) {
+      return next({ name: 'login' })
+    }
+
+    // Has token but not authenticated (no user data) - fetch profile
+    if (!isAuthenticated) {
+      try {
+        await authStore.fetchProfile()
+        return next()
+      } catch (error) {
+        return next({ name: 'login' })
+      }
+    }
+
+    return next()
+  }
+
+  next()
 })
 
 export default router

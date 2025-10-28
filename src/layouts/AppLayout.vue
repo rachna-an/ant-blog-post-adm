@@ -4,6 +4,7 @@
 
     <div class="drawer-content h-full! bg-[#F8F9FC]">
       <!-- <DashboardNavbar /> -->
+      <Navbar />
 
       <!-- Page content  -->
       <main class="p-6! pt-4!">
@@ -12,12 +13,14 @@
     </div>
 
     <!-- <DashboardSidebar /> -->
+    <Sidebar />
   </div>
 </template>
 
 <script setup>
   //   import DashboardNavbar from '@/components/dashboard/DashboardNavbar.vue'
-  //   import DashboardSidebar from '@/components/dashboard/DashboardSidebar.vue'
+  import Navbar from '@/components/dashboard/Navbar.vue'
+  import Sidebar from '@/components/dashboard/Sidebar.vue'
 </script>
 
 <style scoped>

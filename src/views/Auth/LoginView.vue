@@ -123,6 +123,7 @@
       const res = await authStore.login(formData)
       if (!res.result) return
 
+      await authStore.fetchProfile()
       router.push({ name: 'dashboard' })
     } catch (error) {
       const message = error?.message || 'Failed to login.'
