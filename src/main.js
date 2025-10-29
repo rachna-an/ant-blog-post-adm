@@ -7,6 +7,7 @@ import App from './App.vue'
 import router from './router'
 import BaseInput from './components/base/BaseInput.vue'
 import BaseButton from './components/base/BaseButton.vue'
+import BaseTable from './components/base/BaseTable.vue'
 import ConfirmationModal from './components/common/ConfirmationModal.vue'
 
 const app = createApp(App)
@@ -16,6 +17,7 @@ app.use(router)
 
 app.component('BaseInput', BaseInput)
 app.component('BaseButton', BaseButton)
+app.component('BaseTable', BaseTable)
 app.component('ConfirmationModal', ConfirmationModal)
 
 app.mount('#app')

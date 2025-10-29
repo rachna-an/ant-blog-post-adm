@@ -3,8 +3,7 @@
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
 
     <div class="drawer-content h-full! bg-[#F8F9FC]">
-      <!-- <DashboardNavbar /> -->
-      <Navbar />
+      <!-- <Navbar /> -->
 
       <!-- Page content  -->
       <main class="p-6! pt-4!">
@@ -12,7 +11,6 @@
       </main>
     </div>
 
-    <!-- <DashboardSidebar /> -->
     <Sidebar />
   </div>
 </template>
