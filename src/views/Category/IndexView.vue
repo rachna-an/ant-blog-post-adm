@@ -69,11 +69,7 @@
       :perPage="paginate.perPage"
       v-model:currentPage="paginate.currentPage"
       @edit="(id) => openEditModal(id)"
-      @delete="
-        () => {
-          deleteModal.show = true
-        }
-      "
+      @delete="(id) => openDeleteModal(id)"
     >
     </BaseTable>
   </div>
@@ -108,27 +104,14 @@
 
   const toast = useToast()
 
-  const categories = ref([
-    { id: 1, name: 'Technology' },
-    { id: 2, name: 'Health' },
-    { id: 3, name: 'Travel' },
-    { id: 4, name: 'Food' },
-    { id: 5, name: 'Lifestyle' },
-    { id: 6, name: 'Education' },
-    { id: 7, name: 'Finance' },
-    { id: 8, name: 'Entertainment' },
-    { id: 9, name: 'Sports' },
-    { id: 10, name: 'News' },
-    { id: 11, name: 'Science' },
-    { id: 12, name: 'Art' },
-  ])
+  const categories = ref([])
 
   /********** TABLE **********/
   const columns = ref([{ key: 'name', label: 'Category Name' }])
   const paginate = reactive({
     page: 1,
-    perPage: 2,
-    totalItems: 20,
+    perPage: 10,
+    totalItems: 0,
     currentPage: 1,
   })
 
@@ -147,12 +130,44 @@
   // Form state
   const formRef = ref(null)
   const isLoading = ref(false)
-  const editingData = ref(null)
+  const selectedId = ref(null)
   const searchQuery = ref('')
 
   const formData = reactive({
     name: '',
   })
+
+  /********** LOAD DATA **********/
+  const loadCategories = async () => {
+    isLoading.value = true
+    try {
+      const res = await api.get('/categories', {
+        params: {
+          search: searchQuery.value || undefined,
+          _page: paginate.page,
+          _per_page: paginate.perPage,
+          sortBy: 'createdAt',
+          sortDir: 'DESC',
+        },
+      })
+      const data = res.data.data
+      if (res.data.result) {
+        categories.value = data.items.map((cat) => ({
+          id: cat.id,
+          name: cat.name,
+        }))
+        paginate.totalItems = data.meta.totalItems
+        paginate.totalPages = data.meta.totalPages
+      }
+    } catch (error) {
+      console.error(error)
+      const message = error?.response?.data?.message || 'Failed to fetch categories.'
+      toast.showError(message)
+    } finally {
+      isLoading.value = false
+    }
+  }
+  onMounted(loadCategories)
 
   /********** WATCHERS **********/
   watch(
@@ -160,10 +175,20 @@
     (newPage, oldPage) => {
       if (newPage !== oldPage) {
         paginate.page = newPage
-        // loadActivities(false)
+        loadCategories()
       }
     }
   )
+
+  let debounceTimer
+
+  watch(searchQuery, () => {
+    clearTimeout(debounceTimer)
+    debounceTimer = setTimeout(() => {
+      paginate.page = 1
+      loadCategories()
+    }, 350)
+  })
 
   /********** MODAL ACTIONS **********/
   const openCreateModal = async () => {
@@ -175,29 +200,23 @@
   const openEditModal = async (id) => {
     modal.isEdit = true
     formRef.value.resetForm()
-    modal.show = true
+    selectedId.value = id
 
-    const cat = categories.value.find((c) => c.id === id)
-    if (cat) {
-      editingData.value = { ...cat }
-      Object.assign(formData, {
-        name: cat.name,
-      })
-    }
-    return
     try {
-      const res = await api.get(`/category/${id}`)
+      const res = await api.get(`/categories/${id}`)
       if (res.data.result) {
         const cat = res.data.data
-        editingData.value = { ...cat }
-        Object.assign(formData, {
-          name: cat.name,
-        })
+        Object.assign(formData, { name: cat.name })
+        modal.show = true
       }
     } catch (error) {
-      const message = error?.response?.data?.msg || 'Failed to load category for edit.'
-      toast.showError(message)
+      toast.showError(error?.response?.data?.message || 'Failed to load category for edit.')
     }
+  }
+
+  const openDeleteModal = (id) => {
+    selectedId.value = id
+    deleteModal.show = true
   }
 
   /********** SUBMISSION **********/
@@ -207,20 +226,20 @@
 
     try {
       if (modal.isEdit) {
-        const res = await api.put(`/categories/${editingData.value.id}`, formData)
+        const res = await api.put(`/categories/${selectedId.value}`, formData)
         if (!res.data.result) {
-          throw new Error(res.data.msg || 'Failed to update category')
+          throw new Error(res.data.message || 'Failed to update category')
         }
       } else {
         const res = await api.post('/categories', formData)
         if (!res.data.result) {
-          throw new Error(res.data.msg || 'Failed to create category')
+          throw new Error(res.data.message || 'Failed to create category')
         }
       }
 
-      //   await loadCategories()
+      await loadCategories()
       modal.show = false
-      editingData.value = null
+      selectedId.value = null
 
       toast.showSuccess(
         modal.isEdit
@@ -229,29 +248,28 @@
       )
     } catch (error) {
       console.error(error)
+      toast.showError(error?.response?.data?.message || 'Failed to save category.')
     } finally {
       modal.isLoading = false
     }
   }
 
   const handleDelete = async () => {
+    if (!selectedId.value) return
     deleteModal.isLoading = true
+
     try {
-      const res = await api.delete('/category', {
-        data: {
-          ids: deletedIds.value,
-        },
-      })
-      if (!res.data.result) throw new Error(res.data.msg || 'Failed to delete category.')
+      const res = await api.delete(`/categories/${selectedId.value}`)
+      if (!res.data.result) throw new Error(res.data.message || 'Failed to delete category.')
 
-      // await loadCategories()
+      await loadCategories()
       deleteModal.show = false
-
       toast.showSuccess("You've successfully deleted category.")
     } catch (error) {
-      toast.showError(error?.response?.data?.msg || 'Failed to delete category.')
+      toast.showError(error?.response?.data?.message || 'Failed to delete category.')
     } finally {
       deleteModal.isLoading = false
+      selectedId.value = null
     }
   }
 </script>

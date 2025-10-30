@@ -4,11 +4,11 @@
       Showing {{ startEntry }} to {{ endEntry }} of {{ totalItems }} entries
     </span>
 
-    <div v-if="totalItems > 0" class="join flex items-center justify-center gap-2 !mt-4 md:!mt-0">
+    <div v-show="totalItems > 0 && !isLoading" class="join flex items-center justify-center gap-2 !mt-4 md:!mt-0">
       <!-- Previous -->
       <button
         class="join-item btn p-2"
-        :disabled="currentPage === 1 || isLoading"
+        :disabled="currentPage === 1"
         @click="goToPage(currentPage - 1)"
         aria-label="Previous Page"
       >
@@ -38,7 +38,7 @@
           'btn-active': !page.isEllipsis && page.number === currentPage,
           'btn-ghost bg-transparent border-0 pointer-events-none': page.isEllipsis,
         }"
-        :disabled="page.isEllipsis || isLoading"
+        :disabled="page.isEllipsis"
         @click="goToPage(page.number)"
       >
         {{ page.isEllipsis ? '...' : page.number }}
@@ -47,7 +47,7 @@
       <!-- Next -->
       <button
         class="join-item btn p-2"
-        :disabled="currentPage === totalPages || isLoading"
+        :disabled="currentPage === totalPages"
         @click="goToPage(currentPage + 1)"
         aria-label="Next Page"
       >

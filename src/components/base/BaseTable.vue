@@ -16,7 +16,6 @@
       <tr v-for="n in 5" :key="n">
         <td :colspan="columns.length + 2">
           <div class="flex items-center gap-4 py-2">
-            <div class="checkbox !cursor-default"></div>
             <div class="flex-1 grid gap-2">
               <div class="skeleton h-3 w-full"></div>
               <div class="skeleton h-3 w-full"></div>
@@ -50,7 +49,7 @@
             class="btn btn-icon"
             data-testid="btn-delete"
             data-tip="Delete"
-            @click="$emit('delete')"
+            @click="$emit('delete', item.id)"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -99,7 +98,7 @@
     v-model="currentPage"
     :totalItems="totalItems"
     :perPage="perPage"
-    :loading="isLoading"
+    :isLoading="isLoading"
   />
 </template>
 

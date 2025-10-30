@@ -34,6 +34,12 @@ const router = createRouter({
           component: () => import('@/views/Category/IndexView.vue'),
           meta: { title: 'Categories' },
         },
+        {
+          path: 'articles',
+          name: 'article.index',
+          component: () => import('@/views/Article/IndexView.vue'),
+          meta: { title: 'My Articles' },
+        },
       ],
     },
   ],
