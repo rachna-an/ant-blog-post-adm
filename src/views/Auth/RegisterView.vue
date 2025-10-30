@@ -12,16 +12,18 @@
               v-model="formData.firstName"
               label="First Name *"
               placeholder="Enter your first name"
-              :errorMsg="errors.firstName"
-              @blur="validateField('firstName')"
+              :errorMsg="vErrors.firstName"
+              @input="onInput('firstName', formData.firstName)"
+              @blur="onBlur('firstName', formData.firstName)"
             />
 
             <BaseInput
               v-model="formData.lastName"
               label="Last Name *"
               placeholder="Enter your last name"
-              :errorMsg="errors.lastName"
-              @blur="validateField('lastName')"
+              :errorMsg="vErrors.lastName"
+              @input="onInput('lastName', formData.lastName)"
+              @blur="onBlur('lastName', formData.lastName)"
             />
           </div>
 
@@ -30,30 +32,31 @@
             type="email"
             label="Email *"
             placeholder="Enter your email"
-            :errorMsg="errors.email"
-            @blur="validateField('email')"
+            :errorMsg="vErrors.email"
+            @input="onInput('email', formData.email)"
+            @blur="onBlur('email', formData.email)"
           />
 
           <BaseInputPassword
             v-model="formData.password"
             label="Password *"
             placeholder="Enter your password"
-            :errorMsg="errors.password"
-            @blur="validateField('password')"
+            :errorMsg="vErrors.password"
+            @input="onInput('password', formData.password)"
+            @blur="onBlur('password', formData.password)"
           />
 
           <BaseInputPassword
             v-model="formData.confirmPassword"
             label="Confirm Password *"
             placeholder="Confirm your password"
-            :errorMsg="errors.confirmPassword"
-            @blur="validateField('confirmPassword')"
+            :errorMsg="vErrors.confirmPassword"
+            @input="onInput('confirmPassword', formData.confirmPassword)"
+            @blur="onBlur('confirmPassword', formData.confirmPassword), validateConfirmPassword()"
           />
 
           <div class="pt-4">
-            <BaseButton type="submit" :loading="isLoading" class="w-full" @click="handleRegister">
-              Register
-            </BaseButton>
+            <BaseButton type="submit" :loading="isLoading" class="w-full"> Register </BaseButton>
           </div>
         </form>
 
@@ -75,6 +78,8 @@
 <script setup>
   import { ref, reactive } from 'vue'
   import BaseInputPassword from '@/components/base/BaseInputPassword.vue'
+  import { z } from 'zod'
+  import { useFormValidation } from '@/composables/useFormValidation'
   import { useAuthStore } from '@/stores/auth'
   import { useToast } from '@/composables/useToast'
   import { useRouter } from 'vue-router'
@@ -93,77 +98,48 @@
     confirmPassword: '',
   })
 
-  const errors = reactive({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
+  const schema = z.object({
+    firstName: z
+      .string()
+      .min(1, 'First name is required')
+      .max(50, 'First name must not exceed 50 characters'),
+    lastName: z
+      .string()
+      .min(1, 'Last name is required')
+      .max(50, 'Last name must not exceed 50 characters'),
+    email: z.email('Please enter a valid email address').min(1, 'Email is required'),
+    password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .refine(
+        (val) =>
+          val.length === 0 ||
+          (val.length >= 8 &&
+            val.length <= 20 &&
+            /[a-z]/.test(val) &&
+            /[A-Z]/.test(val) &&
+            /\d/.test(val) &&
+            /[^A-Za-z0-9]/.test(val)),
+        {
+          message: 'Password must include uppercase, lowercase, number, and special character',
+        }
+      ),
+    confirmPassword: z.string().min(1, 'Please confirm your password'),
   })
 
-  const validateField = (field) => {
-    errors[field] = ''
+  const { vErrors, validateForm, onInput, onBlur } = useFormValidation(schema, formData)
 
-    switch (field) {
-      case 'firstName':
-        if (!formData.firstName.trim()) {
-          errors.firstName = 'First name is required'
-        } else if (formData.firstName.trim().length < 2) {
-          errors.firstName = 'First name must be at least 2 characters'
-        }
-        break
-
-      case 'lastName':
-        if (!formData.lastName.trim()) {
-          errors.lastName = 'Last name is required'
-        } else if (formData.lastName.trim().length < 2) {
-          errors.lastName = 'Last name must be at least 2 characters'
-        }
-        break
-
-      case 'email':
-        if (!formData.email.trim()) {
-          errors.email = 'Email is required'
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-          errors.email = 'Please enter a valid email address'
-        }
-        break
-
-      case 'password':
-        if (!formData.password) {
-          errors.password = 'Password is required'
-        } else if (formData.password.length < 8) {
-          errors.password = 'Password must be at least 8 characters'
-        }
-        if (formData.confirmPassword) {
-          validateField('confirmPassword')
-        }
-        break
-
-      case 'confirmPassword':
-        if (!formData.confirmPassword) {
-          errors.confirmPassword = 'Please confirm your password'
-        } else if (formData.password !== formData.confirmPassword) {
-          errors.confirmPassword = 'Passwords do not match'
-        }
-        break
+  const validateConfirmPassword = () => {
+    if (formData.confirmPassword && formData.confirmPassword !== formData.password) {
+      vErrors.confirmPassword = 'Passwords do not match'
+      return false
+    } else {
+      vErrors.confirmPassword = ''
+      return true
     }
   }
-
-  const validateForm = () => {
-    validateField('firstName')
-    validateField('lastName')
-    validateField('email')
-    validateField('password')
-    validateField('confirmPassword')
-
-    return !Object.values(errors).some((error) => error !== '')
-  }
-
   const handleRegister = async () => {
-    if (!validateForm()) {
-      return
-    }
+    if (!validateForm(formData) || !validateConfirmPassword()) return
 
     isLoading.value = true
 

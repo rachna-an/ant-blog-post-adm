@@ -3,7 +3,7 @@
     <input id="my-drawer" type="checkbox" class="drawer-toggle" />
 
     <div class="drawer-content h-full! bg-[#F8F9FC]">
-      <!-- <Navbar /> -->
+      <Navbar />
 
       <!-- Page content  -->
       <main class="p-6! pt-4!">
@@ -16,7 +16,6 @@
 </template>
 
 <script setup>
-  //   import DashboardNavbar from '@/components/dashboard/DashboardNavbar.vue'
   import Navbar from '@/components/dashboard/Navbar.vue'
   import Sidebar from '@/components/dashboard/Sidebar.vue'
 </script>

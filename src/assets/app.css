@@ -479,6 +479,10 @@ select option:disabled {
   @apply w-10 h-10 rounded-md;
 }
 
+.join-item.btn {
+  @apply bg-zinc-200/45;
+}
+
 .join-item.btn-active {
   @apply bg-primary text-white;
 }
