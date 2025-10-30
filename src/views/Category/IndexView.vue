@@ -96,15 +96,13 @@
 </template>
 
 <script setup>
-  import { ref, reactive, watch, onMounted, nextTick } from 'vue'
+  import { ref, reactive, watch, onMounted } from 'vue'
   import FormModal from '@/components/common/FormModal.vue'
   import { useToast } from '@/composables/useToast'
   import api from '@/utils/api'
   import CategoryForm from '@/components/forms/CategoryForm.vue'
 
   const toast = useToast()
-
-  const categories = ref([])
 
   /********** TABLE **********/
   const columns = ref([{ key: 'name', label: 'Category Name' }])
@@ -116,6 +114,7 @@
   })
 
   /********** STATE **********/
+  const categories = ref([])
   const modal = reactive({
     show: false,
     isEdit: false,
@@ -181,7 +180,6 @@
   )
 
   let debounceTimer
-
   watch(searchQuery, () => {
     clearTimeout(debounceTimer)
     debounceTimer = setTimeout(() => {

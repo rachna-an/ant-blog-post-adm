@@ -76,16 +76,20 @@
             <ul class="pl-0">
               <li>
                 <RouterLink
-                  :to="{ name: 'article.index' }"
-                  activeClass="menu-active"
-                  class="!pl-12"
+                  :to="{ name: 'article.index' || 'article.edit' }"
+                  :class="[
+                    '!pl-12',
+                    $route.name === 'article.index' || $route.name === 'article.edit'
+                      ? 'menu-active'
+                      : '',
+                  ]"
                   @click="closeDrawer"
                   >All Articles</RouterLink
                 >
               </li>
               <li>
                 <RouterLink
-                  :to="{ name: 'article.index' }"
+                  :to="{ name: 'article.create' }"
                   activeClass="menu-active"
                   class="!pl-12"
                   @click="closeDrawer"

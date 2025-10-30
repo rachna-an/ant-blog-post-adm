@@ -40,6 +40,18 @@ const router = createRouter({
           component: () => import('@/views/Article/IndexView.vue'),
           meta: { title: 'My Articles' },
         },
+        {
+          path: 'articles/create',
+          name: 'article.create',
+          component: () => import('@/views/Article/CreateView.vue'),
+          meta: { title: 'Create Article' },
+        },
+        {
+          path: 'articles/edit/:id',
+          name: 'article.edit',
+          component: () => import('@/views/Article/EditView.vue'),
+          meta: { title: 'Edit Article' },
+        },
       ],
     },
   ],
