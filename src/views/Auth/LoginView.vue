@@ -12,8 +12,9 @@
             type="email"
             label="Email *"
             placeholder="Enter your email"
-            :errorMsg="errors.email"
-            @blur="validateField('email')"
+            :errorMsg="vErrors.email"
+            @input="onInput('email', formData.email)"
+            @blur="onBlur('email', formData.email)"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -36,14 +37,13 @@
             v-model="formData.password"
             label="Password *"
             placeholder="Enter your password"
-            :errorMsg="errors.password"
-            @blur="validateField('password')"
+            :errorMsg="vErrors.password"
+            @input="onInput('password', formData.password)"
+            @blur="onBlur('password', formData.password)"
           />
 
           <div class="pt-4">
-            <BaseButton type="submit" :loading="isLoading" class="w-full" @click="handleLogin">
-              Login
-            </BaseButton>
+            <BaseButton type="submit" :loading="isLoading" class="w-full"> Login </BaseButton>
           </div>
         </form>
 
@@ -64,6 +64,8 @@
 
 <script setup>
   import { ref, reactive } from 'vue'
+  import { z } from 'zod'
+  import { useFormValidation } from '@/composables/useFormValidation'
   import BaseInputPassword from '@/components/base/BaseInputPassword.vue'
   import { useAuthStore } from '@/stores/auth'
   import { useToast } from '@/composables/useToast'
@@ -80,42 +82,21 @@
     password: '',
   })
 
-  const errors = reactive({
-    email: '',
-    password: '',
+  const schema = z.object({
+    email: z
+      .string()
+      .min(1, 'Email is required')
+      .email('Please enter a valid email address'),
+    password: z.string().min(1, 'Password is required'),
   })
 
-  const validateField = (field) => {
-    errors[field] = ''
-
-    switch (field) {
-      case 'email':
-        if (!formData.email.trim()) {
-          errors.email = 'Email is required'
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-          errors.email = 'Please enter a valid email address'
-        }
-        break
-
-      case 'password':
-        if (!formData.password) {
-          errors.password = 'Password is required'
-        }
-        break
-    }
-  }
-
-  const validateForm = () => {
-    validateField('email')
-    validateField('password')
-
-    return !Object.values(errors).some((error) => error !== '')
-  }
+  const { vErrors, validateForm, onInput, onBlur } = useFormValidation(
+    schema,
+    formData
+  )
 
   const handleLogin = async () => {
-    if (!validateForm()) {
-      return
-    }
+    if (!validateForm(formData)) return
 
     isLoading.value = true
 

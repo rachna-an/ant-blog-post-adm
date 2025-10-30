@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="" class="grid gap-3">
+  <form @submit.prevent class="grid gap-3">
     <BaseInput
       type="text"
       label="Category Name *"

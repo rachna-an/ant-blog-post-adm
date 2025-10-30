@@ -14,7 +14,7 @@
   --color-base-200: oklch(98% 0 0);
   --color-base-300: #dcdde0;
   --color-base-content: oklch(21% 0.006 285.885);
-  --color-primary: #114e5e;
+  --color-primary: #312986;
   --color-primary-content: #fff;
   --color-secondary: #f8f9fc;
   --color-secondary-content: #4a5568;
@@ -38,7 +38,7 @@
   --border: 1.5px;
   --depth: 0;
   --noise: 0;
-  --menu-active-bg: #114e5e;
+  --menu-active-bg: #312986;
 }
 :root {
   --dp-border-radius: 10px !important;
@@ -74,7 +74,7 @@ body {
 }
 
 .dp__theme_light {
-  --dp-primary-color: #114e5e !important;
+  --dp-primary-color: #312986 !important;
 }
 
 /** Form Elements */
@@ -265,7 +265,7 @@ select option:disabled {
 .btn-primary {
   &:is(:disabled, [disabled], .btn-disabled) {
     &:not(.btn-link, .btn-ghost) {
-      background-color: #114e5e;
+      background-color: #312986;
       opacity: 0.5;
       color: white;
     }

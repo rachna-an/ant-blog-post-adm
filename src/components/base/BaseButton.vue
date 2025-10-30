@@ -1,7 +1,7 @@
 <template>
   <button
     class="btn btn-primary"
-    type="button"
+    :type="type"
     :disabled="disabled || loading"
     @click="handleClick"
   >
@@ -18,6 +18,10 @@
 
 <script setup>
   const props = defineProps({
+    type: {
+      type: String,
+      default: 'button'
+    },
     disabled: {
       type: Boolean,
       default: false,
