@@ -3,11 +3,11 @@
     <div>
       <h1 class="text-[28px] font-bold! text-primary mb-2!">Category</h1>
       <p class="!text-neutral !font-medium hidden md:flex">
-        Create category for a specific type of categories
+        Create and manage categories for different types of article
       </p>
     </div>
     <div>
-      <BaseButton @click="openCreateModal()" data-testid="btn-create-category">
+      <BaseButton @click="openCreateModal()">
         <template #icon>
           <svg
             width="20px"
@@ -37,7 +37,46 @@
     </div>
   </div>
 
-  <div>body</div>
+  <div class="overflow-x-auto rounded-xl border border-base-300 bg-base-100">
+    <div class="p-4 border-b border-base-300">
+      <label class="input w-100!">
+        <svg class="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <g
+            stroke-linejoin="round"
+            stroke-linecap="round"
+            stroke-width="2.5"
+            fill="none"
+            stroke="currentColor"
+          >
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="m21 21-4.3-4.3"></path>
+          </g>
+        </svg>
+        <input
+          v-model="searchQuery"
+          type="search"
+          placeholder="Search category..."
+          data-testid="search-input"
+        />
+      </label>
+    </div>
+
+    <BaseTable
+      :columns="columns"
+      :items="categories"
+      :isLoading="isLoading"
+      :totalItems="paginate.totalItems"
+      :perPage="paginate.perPage"
+      v-model:currentPage="paginate.currentPage"
+      @edit="(id) => openEditModal(id)"
+      @delete="
+        () => {
+          deleteModal.show = true
+        }
+      "
+    >
+    </BaseTable>
+  </div>
 
   <!-- Create/Edit Modal -->
   <FormModal
@@ -48,6 +87,16 @@
   >
     <CategoryForm ref="formRef" v-model="formData" />
   </FormModal>
+
+  <!-- Delete Modal -->
+  <ConfirmationModal
+    v-model:visible="deleteModal.show"
+    :loading="deleteModal.isLoading"
+    title="Delete Category"
+    message="Are you want to delete this category?"
+    :buttonText="deleteModal.isLoading ? 'Deleting' : 'Delete'"
+    @confirm="handleDelete"
+  />
 </template>
 
 <script setup>
@@ -59,12 +108,39 @@
 
   const toast = useToast()
 
-  /*----------------------------
-   *          STATE
-   *----------------------------*/
+  const categories = ref([
+    { id: 1, name: 'Technology' },
+    { id: 2, name: 'Health' },
+    { id: 3, name: 'Travel' },
+    { id: 4, name: 'Food' },
+    { id: 5, name: 'Lifestyle' },
+    { id: 6, name: 'Education' },
+    { id: 7, name: 'Finance' },
+    { id: 8, name: 'Entertainment' },
+    { id: 9, name: 'Sports' },
+    { id: 10, name: 'News' },
+    { id: 11, name: 'Science' },
+    { id: 12, name: 'Art' },
+  ])
+
+  /********** TABLE **********/
+  const columns = ref([{ key: 'name', label: 'Category Name' }])
+  const paginate = reactive({
+    page: 1,
+    perPage: 2,
+    totalItems: 20,
+    currentPage: 1,
+  })
+
+  /********** STATE **********/
   const modal = reactive({
     show: false,
     isEdit: false,
+    isLoading: false,
+  })
+
+  const deleteModal = reactive({
+    show: false,
     isLoading: false,
   })
 
@@ -72,24 +148,59 @@
   const formRef = ref(null)
   const isLoading = ref(false)
   const editingData = ref(null)
+  const searchQuery = ref('')
 
   const formData = reactive({
     name: '',
   })
 
-  /*----------------------------
-   *       MODAL ACTIONS
-   *----------------------------*/
+  /********** WATCHERS **********/
+  watch(
+    () => paginate.currentPage,
+    (newPage, oldPage) => {
+      if (newPage !== oldPage) {
+        paginate.page = newPage
+        // loadActivities(false)
+      }
+    }
+  )
+
+  /********** MODAL ACTIONS **********/
   const openCreateModal = async () => {
     modal.isEdit = false
     modal.show = true
-    await nextTick()
     formRef.value?.resetForm()
   }
 
-  /*----------------------------
-   *         SUBMISSION
-   *----------------------------*/
+  const openEditModal = async (id) => {
+    modal.isEdit = true
+    formRef.value.resetForm()
+    modal.show = true
+
+    const cat = categories.value.find((c) => c.id === id)
+    if (cat) {
+      editingData.value = { ...cat }
+      Object.assign(formData, {
+        name: cat.name,
+      })
+    }
+    return
+    try {
+      const res = await api.get(`/category/${id}`)
+      if (res.data.result) {
+        const cat = res.data.data
+        editingData.value = { ...cat }
+        Object.assign(formData, {
+          name: cat.name,
+        })
+      }
+    } catch (error) {
+      const message = error?.response?.data?.msg || 'Failed to load category for edit.'
+      toast.showError(message)
+    }
+  }
+
+  /********** SUBMISSION **********/
   const handleSave = async () => {
     if (!formRef.value.validateForm()) return
     modal.isLoading = true
@@ -120,6 +231,27 @@
       console.error(error)
     } finally {
       modal.isLoading = false
+    }
+  }
+
+  const handleDelete = async () => {
+    deleteModal.isLoading = true
+    try {
+      const res = await api.delete('/category', {
+        data: {
+          ids: deletedIds.value,
+        },
+      })
+      if (!res.data.result) throw new Error(res.data.msg || 'Failed to delete category.')
+
+      // await loadCategories()
+      deleteModal.show = false
+
+      toast.showSuccess("You've successfully deleted category.")
+    } catch (error) {
+      toast.showError(error?.response?.data?.msg || 'Failed to delete category.')
+    } finally {
+      deleteModal.isLoading = false
     }
   }
 </script>
