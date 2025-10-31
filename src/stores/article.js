@@ -37,6 +37,35 @@ export const useArticleStore = defineStore('article', () => {
     }
   }
 
+  const createArticle = async (payload) => {
+    try {
+      const res = await api.post('/articles', payload)
+      return res.data
+    } catch (err) {
+      throw err.response?.data || err.message
+    }
+  }
+
+  const createThumbnail = async (id, payload) => {
+    try {
+      const res = await api.post(`/articles/${id}/thumbnail`, payload, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      return res.data
+    } catch (err) {
+      throw err.response?.data || err.message
+    }
+  }
+
+  const deleteArticle = async (id) => {
+    try {
+      const res = await api.delete(`/articles/${id}`)
+      return res.data
+    } catch (err) {
+      throw err.response?.data || err.message
+    }
+  }
+
   return {
     articles,
     categories,
@@ -44,5 +73,8 @@ export const useArticleStore = defineStore('article', () => {
     search,
     onLoadArticles,
     fetchCategories,
+    createArticle,
+    createThumbnail,
+    deleteArticle,
   }
 })

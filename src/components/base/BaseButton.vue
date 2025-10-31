@@ -1,6 +1,6 @@
 <template>
   <button
-    class="btn btn-primary"
+    :class="['btn', btnClass]"
     :type="type"
     :disabled="disabled || loading"
     @click="handleClick"
@@ -21,6 +21,10 @@
     type: {
       type: String,
       default: 'button'
+    },
+    btnClass: {
+      type: String,
+      default: 'btn-primary'
     },
     disabled: {
       type: Boolean,

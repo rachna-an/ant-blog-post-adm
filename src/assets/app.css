@@ -118,6 +118,16 @@ body {
   }
 }
 
+.file-input {
+  color: var(--color-zinc-600);
+  @layer daisyui.modifier {
+    &::file-selector-button {
+      color: var(--color-zinc-500);
+      font-weight: 500;
+    }
+  }
+}
+
 input[type='search']::-webkit-search-cancel-button {
   -webkit-appearance: none;
   appearance: none;
@@ -150,6 +160,16 @@ select option:disabled {
   background-image: url('@/assets/svg/select-arrow.svg');
   background-position: right 8px center;
   background-size: 20px 20px;
+
+  @layer daisyui.component {
+    &,
+    & select {
+      &::picker(select) {
+        border: var(--border) solid var(--color-zinc-200);
+        @apply rounded-md my-2 p-2 shadow-sm!;
+      }
+    }
+  }
 }
 
 .select:has(option:checked[value='']) {
@@ -289,29 +309,6 @@ select option:disabled {
       opacity: 0.5;
       color: white;
     }
-  }
-}
-
-.btn-outline {
-  &:not(
-    .btn-active,
-    :hover,
-    :active:focus,
-    :focus-visible,
-    :disabled,
-    [disabled],
-    .btn-disabled,
-    :checked
-  ) {
-    --btn-shadow: '';
-    --btn-bg: #0000;
-    --btn-fg: var(--btn-color);
-    --btn-border: #4a5568 !important;
-    color: #4a5568;
-  }
-
-  &:is(.btn-active, :hover, :active:focus, :focus-visible) {
-    @apply text-neutral-700 border-neutral-700 bg-neutral-100 outline-neutral-700;
   }
 }
 

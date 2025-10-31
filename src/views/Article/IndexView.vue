@@ -65,6 +65,21 @@
       @edit="(id) => handleEdit(id)"
       @delete="(id) => openDeleteModal(id)"
     >
+      <template #column-thumbnail="{ value }">
+        <img :src="value" alt="Thumbnail" class="h-[45px] w-full object-cover rounded-sm" />
+      </template>
+
+      <template #column-category="{ value }">
+        <span
+          class="badge badge-soft badge-primary text-primary/80 h-auto w-auto rounded-full !font-medium !text-xs"
+        >
+          {{ value }}
+        </span>
+      </template>
+
+      <template #column-createdAt="{ value }">
+        <span>{{ formatDate(value) }}</span>
+      </template>
     </BaseTable>
   </div>
 
@@ -84,12 +99,16 @@
   import { useRouter } from 'vue-router'
   import { useToast } from '@/composables/useToast'
   import api from '@/utils/api'
+  import { formatDate } from '@/utils/dateFormat'
+  import { useArticleStore } from '@/stores/article'
 
   const router = useRouter()
   const toast = useToast()
+  const articleStore = useArticleStore()
 
   /********** TABLE **********/
   const columns = ref([
+    { key: 'thumbnail', label: '' },
     { key: 'title', label: 'Title' },
     { key: 'category', label: 'Category' },
     { key: 'createdAt', label: 'Created At' },
@@ -167,9 +186,9 @@
   })
 
   /********** ACTIONS **********/
-
   const handleEdit = (id) => {
-    router.push({ name: 'article.edit', params: { id } })
+    // router.push({ name: 'article.edit', params: { id } })
+    console.log(`Article ID: ${id}`)
   }
 
   const openDeleteModal = (id) => {
@@ -182,17 +201,29 @@
     deleteModal.isLoading = true
 
     try {
-      const res = await api.delete(`/articles/${selectedId.value}`)
-      if (!res.data.result) throw new Error(res.data.message || 'Failed to delete category.')
+      const res = await articleStore.deleteArticle(selectedId.value)
+      if (!res.result) throw new Error(res.message || 'Failed to delete article.')
 
       await loadArticles()
       deleteModal.show = false
-      toast.showSuccess("You've successfully deleted category.")
+      toast.showSuccess("You've successfully deleted article.")
     } catch (error) {
-      toast.showError(error?.response?.data?.message || 'Failed to delete category.')
+      toast.showError(error?.message || 'Failed to delete article.')
     } finally {
       deleteModal.isLoading = false
       selectedId.value = null
     }
   }
 </script>
+
+<style scoped>
+  ::v-deep tbody tr td:first-of-type {
+    padding: 5px 10px !important;
+  }
+
+  ::v-deep tbody tr td:nth-of-type(2) {
+    padding-left: 5px !important;
+    font-weight: 600 !important;
+    color: var(--color-neutral) !important;
+  }
+</style>
