@@ -221,6 +221,10 @@
     padding: 5px 10px !important;
   }
 
+  ::v-deep thead tr th:nth-of-type(2) {
+    padding-left: 5px !important;
+  }
+  
   ::v-deep tbody tr td:nth-of-type(2) {
     padding-left: 5px !important;
     font-weight: 600 !important;

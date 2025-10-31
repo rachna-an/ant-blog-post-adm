@@ -12,7 +12,7 @@ export const useArticleStore = defineStore('article', () => {
     isLoading.value = true
     try {
       const res = await api.get('articles', { params })
-      articles.value = res.data.data
+      articles.value = res.data.data.items
       return res.data.paginate?.total || 0
     } catch (err) {
       throw err

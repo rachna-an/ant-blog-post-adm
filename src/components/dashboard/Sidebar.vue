@@ -40,8 +40,7 @@
           <details
             :open="
               $route.name === 'article.index' ||
-              $route.name === 'article.create' ||
-              $route.name === 'article.edit'
+              $route.name === 'article.create'
             "
           >
             <summary>
@@ -76,10 +75,10 @@
             <ul class="pl-0">
               <li>
                 <RouterLink
-                  :to="{ name: 'article.index' || 'article.edit' }"
+                  :to="{ name: 'article.index' }"
                   :class="[
                     '!pl-12',
-                    $route.name === 'article.index' || $route.name === 'article.edit'
+                    $route.name === 'article.index'
                       ? 'menu-active'
                       : '',
                   ]"
