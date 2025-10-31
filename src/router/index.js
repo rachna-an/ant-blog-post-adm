@@ -49,6 +49,7 @@ const router = createRouter({
         {
           path: 'articles/:id',
           name: 'article.preview',
+          props: true,
           component: () => import('@/views/Article/PreviewView.vue'),
           meta: { title: 'Preview Article' },
         },

@@ -1,4 +1,4 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import api from '@/utils/api'
 
@@ -7,17 +7,54 @@ export const useArticleStore = defineStore('article', () => {
   const categories = ref([])
   const isLoading = ref(false)
   const search = ref('')
+  const page = ref(1)
+  const perPage = ref(8)
+  const hasMore = ref(true)
 
-  const onLoadArticles = async (params = {}) => {
+  // for Dashboard
+  const fetchArticles = async (loadMore = false) => {
     isLoading.value = true
     try {
-      const res = await api.get('articles', { params })
-      articles.value = res.data.data.items
-      return res.data.paginate?.total || 0
+      const res = await api.get('articles', {
+        params: {
+          _page: page.value,
+          _per_page: perPage.value,
+        },
+      })
+
+      const items = res.data.data.items || []
+      const meta = res.data.data.meta || {}
+
+      if (loadMore) {
+        articles.value = [...articles.value, ...items]
+      } else {
+        articles.value = items
+      }
+
+      hasMore.value = meta.hasNextPage === true
     } catch (err) {
       throw err
     } finally {
       isLoading.value = false
+    }
+  }
+
+  const loadMoreArticles = async () => {
+    page.value++
+    await fetchArticles(true)
+  }
+
+  const resetPagination = () => {
+    page.value = 1
+    hasMore.value = true
+  }
+
+  const fetchArticleById = async (id) => {
+    try {
+      const res = await api.get(`/articles/${id}`)
+      return res.data.data
+    } catch (err) {
+      throw err.response?.data || err.message
     }
   }
 
@@ -71,7 +108,11 @@ export const useArticleStore = defineStore('article', () => {
     categories,
     isLoading,
     search,
-    onLoadArticles,
+    hasMore,
+    fetchArticles,
+    fetchArticleById,
+    loadMoreArticles,
+    resetPagination,
     fetchCategories,
     createArticle,
     createThumbnail,

@@ -3,7 +3,7 @@
     class="navbar min-h-[62px] bg-base-100 border-b border-base-300 sticky top-0 z-10 shadow-2xs"
   >
     <div class="navbar-start">
-      <div class="!h-[62px] w-[10px] bg-white absolute -left-1.5"></div>
+      <div class="!h-[61px] w-[10px] bg-white absolute -left-1.5"></div>
 
       <label for="my-drawer" class="btn btn-square bg-transparent border-0 drawer-button lg:hidden">
         <svg

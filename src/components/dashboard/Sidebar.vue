@@ -15,7 +15,9 @@
         <li>
           <RouterLink
             :to="{ name: 'dashboard' }"
-            exactActiveClass="menu-active"
+            :class="{
+              'menu-active': $route.name === 'dashboard' || $route.name === 'article.preview',
+            }"
             @click="closeDrawer"
           >
             <svg
@@ -37,12 +39,7 @@
         </li>
 
         <li>
-          <details
-            :open="
-              $route.name === 'article.index' ||
-              $route.name === 'article.create'
-            "
-          >
+          <details :open="$route.name === 'article.index' || $route.name === 'article.create'">
             <summary>
               <svg
                 width="20px"
@@ -76,12 +73,7 @@
               <li>
                 <RouterLink
                   :to="{ name: 'article.index' }"
-                  :class="[
-                    '!pl-12',
-                    $route.name === 'article.index'
-                      ? 'menu-active'
-                      : '',
-                  ]"
+                  :class="['!pl-12', $route.name === 'article.index' ? 'menu-active' : '']"
                   @click="closeDrawer"
                   >All Articles</RouterLink
                 >
