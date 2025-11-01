@@ -48,7 +48,7 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const res = await api.get('/auth/profile')
       setUser(res.data.data)
-      console.log(res);
+      console.log(res)
       return res.data
     } catch (err) {
       logout()
@@ -56,10 +56,28 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  const logout = () => {
-    setToken(null)
-    setUser(null)
+  const logout = async () => {
+    try {
+      const res = await api.delete('/auth/logout')
+      if (res.data.result) {
+        setToken(null)
+        setUser(null)
+      }
+      return res.data
+    } catch (err) {
+      throw err.response?.data || err.message
+    }
   }
 
-  return { getToken, getUser, isAuthenticated, setToken, setUser, register, login, fetchProfile, logout }
+  return {
+    getToken,
+    getUser,
+    isAuthenticated,
+    setToken,
+    setUser,
+    register,
+    login,
+    fetchProfile,
+    logout,
+  }
 })

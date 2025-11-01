@@ -219,6 +219,7 @@
 <style scoped>
   ::v-deep tbody tr td:first-of-type {
     padding: 5px 10px !important;
+    width: 120px !important;
   }
 
   ::v-deep thead tr th:nth-of-type(2) {

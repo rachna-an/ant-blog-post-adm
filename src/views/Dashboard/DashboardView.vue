@@ -27,7 +27,7 @@
     <div class="flex justify-center mt-6">
       <BaseButton
         v-if="articleStore.hasMore"
-        btnClass="btn-outline btn-primary"
+        btnClass="btn-outline border-neutral-400 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-700 disabled:bg-neutral-100 disabled:text-neutral-400"
         @click="articleStore.loadMoreArticles"
         :disabled="!articleStore.hasMore || articleStore.isLoading"
         :isLoading="articleStore.isLoading"

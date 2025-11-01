@@ -29,17 +29,17 @@
       <div class="flex gap-2">
         <div class="flex flex-col items-end justify-center gap-1/2">
           <h1 class="text-neutral !text-base !font-bold">
-            {{ user.firstName }} {{ user.lastName }}
+            {{ user?.firstName }} {{ user?.lastName }}
           </h1>
           <span
             class="block text-xs text-neutral !font-medium truncate max-w-[200px] sm:max-w-full"
-            >{{ user.email }}</span
+            >{{ user?.email }}</span
           >
         </div>
         <div class="dropdown dropdown-end dropdown-hover">
           <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
             <div class="w-10 rounded-full">
-              <img alt="Profile Picture" :src="user.avatar" />
+              <img alt="Profile Picture" :src="user?.avatar" />
             </div>
           </div>
           <ul
@@ -110,9 +110,11 @@
   import { useAuthStore } from '@/stores/auth'
   import { useRouter } from 'vue-router'
   import { ref, computed } from 'vue'
+  import { useToast } from '@/composables/useToast'
 
   const authStore = useAuthStore()
   const router = useRouter()
+  const toast = useToast()
 
   const isLogout = ref(false)
   const isLoading = ref(false)
@@ -123,8 +125,16 @@
     isLogout.value = true
   }
   const handleLogout = async () => {
-    await authStore.logout()
-    router.push({ name: 'login' })
+    try {
+      isLoading.value = true
+      await authStore.logout()
+      router.push({ name: 'login' })
+    } catch (error) {
+      const message = error?.message || 'Failed to logout.'
+      toast.showError(message)
+    } finally {
+      isLoading.value = false
+    }
   }
 
   const closeDropdownMenu = () => {

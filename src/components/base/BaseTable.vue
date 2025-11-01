@@ -31,7 +31,7 @@
         <td :colspan="columns.length + 2">
           <div class="grid grid-cols-1 place-items-center gap-4 py-14">
             <img src="@/assets/svg/no-data.svg" alt="No data" />
-            <p class="text-2xl !font-semibold text-primary">No Data Found</p>
+            <p class="text-2xl !font-semibold text-neutral">No data found</p>
           </div>
         </td>
       </tr>
