@@ -2,10 +2,10 @@
   <div class="card bg-white border border-base-300 shadow-md rounded-lg p-5">
     <div v-if="article" class="grid gap-4 text-neutral-800">
       <div class="relative">
-        <div
+        <div v-if="article.category"
           class="absolute badge badge-soft bg-white/40 !border-white/10 rounded-full py-3! px-5! text-zinc-600! font-semibold! m-3! backdrop-blur-xs!"
         >
-          {{ article.category.name }}
+          {{ article.category?.name }}
         </div>
         <img
           :src="article.thumbnail"

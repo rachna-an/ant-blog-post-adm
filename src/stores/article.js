@@ -8,7 +8,7 @@ export const useArticleStore = defineStore('article', () => {
   const isLoading = ref(false)
   const search = ref('')
   const page = ref(1)
-  const perPage = ref(8)
+  const perPage = ref(12)
   const hasMore = ref(true)
 
   // for Dashboard
@@ -19,6 +19,8 @@ export const useArticleStore = defineStore('article', () => {
         params: {
           _page: page.value,
           _per_page: perPage.value,
+          sortBy: 'createdAt',
+          sortDir: 'desc'
         },
       })
 

@@ -70,7 +70,7 @@
       </template>
 
       <template #column-category="{ value }">
-        <span
+        <span v-if="value"
           class="badge badge-soft badge-primary text-primary/80 h-auto w-auto rounded-full !font-medium !text-xs"
         >
           {{ value }}
@@ -149,7 +149,7 @@
           id: article.id,
           title: article.title,
           thumbnail: article.thumbnail,
-          category: article.category.name,
+          category: article.category?.name || '',
           createdAt: article.createdAt,
         }))
         paginate.totalItems = data.meta.totalItems
@@ -225,7 +225,7 @@
   ::v-deep thead tr th:nth-of-type(2) {
     padding-left: 5px !important;
   }
-  
+
   ::v-deep tbody tr td:nth-of-type(2) {
     padding-left: 5px !important;
     font-weight: 600 !important;
